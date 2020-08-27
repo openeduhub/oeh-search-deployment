@@ -1,0 +1,61 @@
+version: "3.4"
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.4.2
+    environment:
+      - "discovery.type=single-node"
+      #- ELASTIC_PASSWORD=changethisinproduction
+      #- xpack.security.enabled=true
+      - http.port=9200
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,Access-Control-Allow-Headers,Accept
+      - http.cors.allow-credentials=true
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms2g -Xmx4g'
+    networks:
+      - elasticnet
+    ports:
+      - "127.0.0.1:9200:9200"
+    restart: on-failure
+    volumes: 
+      - es-data:/usr/share/elasticsearch/data
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.4.2
+    networks: 
+      - elasticnet
+    depends_on:
+      - elasticsearch
+    ports:
+      - "127.0.0.1:5601:5601"
+  frontend:
+    image: openeduhub/oeh-search-frontend:${RELEASE}
+    networks:
+      - elasticnet
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      - elasticsearch-relay
+  elasticsearch-relay:
+    image: openeduhub/oeh-search-elasticsearch-relay:${RELEASE}
+    networks:
+      - elasticnet
+    environment:
+      - URL=${URL?See "Runtime Configuration" on Readme.md}/relay
+      - FRONTEND_URL=${URL}
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_INDEX=workspace
+      - ELASTICSEARCH_MAPPING=edu-sharing
+      - EDUSHARING_URL=https://redaktion.openeduhub.net/edu-sharing
+    ports:
+      - "127.0.0.1:3000:80"
+    depends_on:
+      - elasticsearch
+
+networks:
+  elasticnet:
+
+volumes:
+  es-data:
+      driver: local
