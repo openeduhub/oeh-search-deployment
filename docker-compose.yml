@@ -33,6 +33,9 @@ services:
     image: openeduhub/oeh-search-frontend:${RELEASE}
     networks:
       - elasticnet
+    environment:
+      - WORDPRESS_URL=${WORDPRESS_URL?}
+      - SHOW_EXPERIMENTS=${SHOW_EXPERIMENTS}
     ports:
       - "127.0.0.1:8080:80"
     depends_on:
@@ -47,7 +50,7 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - ELASTICSEARCH_INDEX=workspace
       - ELASTICSEARCH_MAPPING=edu-sharing
-      - EDUSHARING_URL=https://redaktion.openeduhub.net/edu-sharing
+      - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
