@@ -30,7 +30,7 @@ services:
     ports:
       - "127.0.0.1:5601:5601"
   frontend:
-    image: openeduhub/oeh-search-frontend:${RELEASE}
+    image: openeduhub/oeh-search-frontend:${FRONTEND_RELEASE}
     networks:
       - elasticnet
     environment:
@@ -41,7 +41,7 @@ services:
     depends_on:
       - elasticsearch-relay
   elasticsearch-relay:
-    image: openeduhub/oeh-search-elasticsearch-relay:${RELEASE}
+    image: openeduhub/oeh-search-elasticsearch-relay:${ELASTICSEARCH_RELAY_RELEASE}
     networks:
       - elasticnet
     environment:
