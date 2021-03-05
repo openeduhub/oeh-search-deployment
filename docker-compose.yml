@@ -1,10 +1,10 @@
-version: "3.4"
+version: '3.4'
 
 services:
   elasticsearch:
     image: elasticsearch:7.4.2
     environment:
-      - "discovery.type=single-node"
+      - 'discovery.type=single-node'
       #- ELASTIC_PASSWORD=changethisinproduction
       #- xpack.security.enabled=true
       - http.port=9200
@@ -17,18 +17,18 @@ services:
     networks:
       - elasticnet
     ports:
-      - "127.0.0.1:9200:9200"
+      - '127.0.0.1:9200:9200'
     restart: on-failure
-    volumes: 
+    volumes:
       - es-data:/usr/share/elasticsearch/data
   kibana:
     image: docker.elastic.co/kibana/kibana:7.4.2
-    networks: 
+    networks:
       - elasticnet
     depends_on:
       - elasticsearch
     ports:
-      - "127.0.0.1:5601:5601"
+      - '127.0.0.1:5601:5601'
   frontend:
     image: openeduhub/oeh-search-frontend:${FRONTEND_RELEASE}
     networks:
@@ -37,7 +37,7 @@ services:
       - WORDPRESS_URL=${WORDPRESS_URL?}
       - SHOW_EXPERIMENTS=${SHOW_EXPERIMENTS}
     ports:
-      - "127.0.0.1:8080:80"
+      - '127.0.0.1:8080:80'
     depends_on:
       - elasticsearch-relay
   elasticsearch-relay:
@@ -52,13 +52,14 @@ services:
       - ELASTICSEARCH_MAPPING=edu-sharing
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
-      - "127.0.0.1:3000:80"
+      - '127.0.0.1:3000:80'
     depends_on:
       - elasticsearch
+    restart: always
 
 networks:
   elasticnet:
 
 volumes:
   es-data:
-      driver: local
+    driver: local
