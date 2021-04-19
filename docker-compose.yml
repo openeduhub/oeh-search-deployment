@@ -56,6 +56,17 @@ services:
     depends_on:
       - elasticsearch
     restart: always
+  analytics:
+    image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
+    networks:
+      - elasticnet
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - '127.0.0.1:3001:3000'
+    depends_on:
+      - elasticsearch
+    restart: always
 
 networks:
   elasticnet:
