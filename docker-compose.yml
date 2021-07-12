@@ -47,26 +47,22 @@ services:
     environment:
       - URL=${URL?See "Runtime Configuration" on Readme.md}/relay
       - FRONTEND_URL=${URL}
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://localhost:9200}
       - ELASTICSEARCH_INDEX=workspace
       - ELASTICSEARCH_MAPPING=edu-sharing
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
       - '127.0.0.1:3000:80'
-    depends_on:
-      - elasticsearch
     restart: always
   analytics:
     image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
     networks:
       - elasticnet
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://localhost:9200}
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
       - '127.0.0.1:3001:3000'
-    depends_on:
-      - elasticsearch
     restart: always
 
 networks:
