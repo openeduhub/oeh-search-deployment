@@ -47,22 +47,26 @@ services:
     environment:
       - URL=${URL?See "Runtime Configuration" on Readme.md}/relay
       - FRONTEND_URL=${URL}
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://localhost:9200}
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://host.docker.internal:9200}
       - ELASTICSEARCH_INDEX=workspace
       - ELASTICSEARCH_MAPPING=edu-sharing
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
       - '127.0.0.1:3000:80'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
   analytics:
     image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
     networks:
       - elasticnet
     environment:
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://localhost:9200}
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://host.docker.internal:9200}
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
       - '127.0.0.1:3001:3000'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
 
 networks:
