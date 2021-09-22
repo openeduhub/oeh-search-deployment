@@ -35,6 +35,7 @@ services:
       - elasticnet
     environment:
       - WORDPRESS_URL=${WORDPRESS_URL?}
+      - EDU_SHARING_API_URL=${EDUSHARING_URL?}/rest
       - SHOW_EXPERIMENTS=${SHOW_EXPERIMENTS}
     ports:
       - '127.0.0.1:8080:80'
