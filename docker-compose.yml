@@ -23,12 +23,12 @@ services:
       - es-data:/usr/share/elasticsearch/data
   kibana:
     image: docker.elastic.co/kibana/kibana:7.4.2
-    networks:
-      - elasticnet
-    depends_on:
-      - elasticsearch
     ports:
       - '127.0.0.1:5601:5601'
+    environment:
+      - SERVER_BASEPATH=/kibana
+      - ELASTICSEARCH_HOSTS=http://localhost:9200
+    network_mode: "host"
   frontend:
     image: openeduhub/oeh-search-frontend:${FRONTEND_RELEASE}
     networks:
@@ -42,8 +42,6 @@ services:
       - elasticsearch-relay
   elasticsearch-relay:
     image: openeduhub/oeh-search-elasticsearch-relay:${ELASTICSEARCH_RELAY_RELEASE}
-    networks:
-      - elasticnet
     environment:
       - URL=${URL?See "Runtime Configuration" on Readme.md}/relay
       - FRONTEND_URL=${URL}
@@ -51,22 +49,16 @@ services:
       - ELASTICSEARCH_INDEX=workspace
       - ELASTICSEARCH_MAPPING=edu-sharing
       - EDUSHARING_URL=${EDUSHARING_URL?}
-    ports:
-      - '127.0.0.1:3000:80'
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - PORT=3000
+    network_mode: "host"
     restart: always
   analytics:
     image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
-    networks:
-      - elasticnet
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://host.docker.internal:9200}
       - EDUSHARING_URL=${EDUSHARING_URL?}
-    ports:
-      - '127.0.0.1:3001:3000'
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - PORT=3001
+    network_mode: "host"
     restart: always
 
 networks:
