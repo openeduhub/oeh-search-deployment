@@ -16,8 +16,6 @@ services:
       - 'ES_JAVA_OPTS=-Xms2g -Xmx4g'
     networks:
       - elasticnet
-    ports:
-      - '127.0.0.1:9200:9200'
     restart: on-failure
     volumes:
       - es-data:/usr/share/elasticsearch/data
@@ -28,7 +26,7 @@ services:
     environment:
       - SERVER_BASEPATH=/kibana
       - ELASTICSEARCH_HOSTS=http://localhost:9200
-    network_mode: "host"
+    network_mode: 'host'
   frontend:
     image: openeduhub/oeh-search-frontend:${FRONTEND_RELEASE}
     networks:
@@ -50,15 +48,21 @@ services:
       - ELASTICSEARCH_MAPPING=edu-sharing
       - EDUSHARING_URL=${EDUSHARING_URL?}
       - PORT=3000
-    network_mode: "host"
+    network_mode: 'host'
     restart: always
   analytics:
     image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
+    # Hard-code to use the bundled elasticsearch, while the relay uses a tunnel via localhost:9200
+    # to a remote instance.
+    networks:
+      - elasticnet
     environment:
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://host.docker.internal:9200}
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
       - EDUSHARING_URL=${EDUSHARING_URL?}
-      - PORT=3001
-    network_mode: "host"
+    ports:
+      - '127.0.0.1:3001:3000'
+    depends_on:
+      - elasticsearch
     restart: always
 
 networks:

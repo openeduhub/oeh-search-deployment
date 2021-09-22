@@ -3,4 +3,4 @@
 set -e
 
 docker-compose pull
-docker-compose up -d --no-deps frontend elasticsearch-relay
+docker-compose up -d --no-deps frontend elasticsearch-relay analytics
