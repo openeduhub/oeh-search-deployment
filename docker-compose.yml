@@ -1,36 +1,8 @@
 version: '3.4'
 
 services:
-  elasticsearch:
-    image: elasticsearch:7.4.2
-    environment:
-      - 'discovery.type=single-node'
-      #- ELASTIC_PASSWORD=changethisinproduction
-      #- xpack.security.enabled=true
-      - http.port=9200
-      - http.cors.enabled=true
-      - http.cors.allow-origin=*
-      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,Access-Control-Allow-Headers,Accept
-      - http.cors.allow-credentials=true
-      - bootstrap.memory_lock=true
-      - 'ES_JAVA_OPTS=-Xms2g -Xmx4g'
-    networks:
-      - elasticnet
-    restart: on-failure
-    volumes:
-      - es-data:/usr/share/elasticsearch/data
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.4.2
-    ports:
-      - '127.0.0.1:5601:5601'
-    environment:
-      - SERVER_BASEPATH=/kibana
-      - ELASTICSEARCH_HOSTS=http://localhost:9200
-    network_mode: 'host'
   frontend:
     image: openeduhub/oeh-search-frontend:${FRONTEND_RELEASE}
-    networks:
-      - elasticnet
     environment:
       - WORDPRESS_URL=${WORDPRESS_URL?}
       - EDU_SHARING_API_URL=${EDUSHARING_URL?}/rest
@@ -39,36 +11,24 @@ services:
       - '127.0.0.1:8080:80'
     depends_on:
       - elasticsearch-relay
+    restart: always
   elasticsearch-relay:
     image: openeduhub/oeh-search-elasticsearch-relay:${ELASTICSEARCH_RELAY_RELEASE}
     environment:
       - URL=${URL?See "Runtime Configuration" on Readme.md}/relay
       - FRONTEND_URL=${URL}
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL-http://host.docker.internal:9200}
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL?}
       - ELASTICSEARCH_INDEX=workspace
       - ELASTICSEARCH_MAPPING=edu-sharing
       - EDUSHARING_URL=${EDUSHARING_URL?}
-      - PORT=3000
-    network_mode: 'host'
+    ports:
+      - '127.0.0.1:3000:80'
     restart: always
   analytics:
     image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
-    # Hard-code to use the bundled elasticsearch, while the relay uses a tunnel via localhost:9200
-    # to a remote instance.
-    networks:
-      - elasticnet
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL?}
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
       - '127.0.0.1:3001:3000'
-    depends_on:
-      - elasticsearch
     restart: always
-
-networks:
-  elasticnet:
-
-volumes:
-  es-data:
-    driver: local
