@@ -8,7 +8,7 @@ services:
       - EDU_SHARING_API_URL=${EDUSHARING_URL?}/rest
       - SHOW_EXPERIMENTS=${SHOW_EXPERIMENTS}
     ports:
-      - '127.0.0.1:8080:80'
+      - '127.0.0.1:${FRONTEND_PORT?}:80'
     depends_on:
       - elasticsearch-relay
     restart: always
@@ -22,7 +22,7 @@ services:
       - ELASTICSEARCH_MAPPING=edu-sharing
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
-      - '127.0.0.1:3000:80'
+      - '127.0.0.1:${ELASTICSEARCH_RELAY_PORT?}:80'
     restart: always
   analytics:
     image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
@@ -30,5 +30,5 @@ services:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL?}
       - EDUSHARING_URL=${EDUSHARING_URL?}
     ports:
-      - '127.0.0.1:3001:3000'
+      - '127.0.0.1:${ANALYTICS_PORT?}:3000'
     restart: always
