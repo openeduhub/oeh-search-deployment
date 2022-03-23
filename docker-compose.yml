@@ -2,10 +2,7 @@ version: '3.4'
 
 x-logging-config: &logging-config
   logging:
-    driver: 'json-file'
-    options:
-      max-file: '5'
-      max-size: '100M'
+    driver: 'local'
 
 services:
   frontend:
