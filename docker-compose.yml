@@ -14,21 +14,6 @@ services:
       - SHOW_EXPERIMENTS=${SHOW_EXPERIMENTS}
     ports:
       - '127.0.0.1:${FRONTEND_PORT?}:80'
-    depends_on:
-      - elasticsearch-relay
-    restart: always
-  elasticsearch-relay:
-    image: openeduhub/oeh-search-elasticsearch-relay:${ELASTICSEARCH_RELAY_RELEASE}
-    <<: *logging-config
-    environment:
-      - URL=${URL?See "Runtime Configuration" on Readme.md}/relay
-      - FRONTEND_URL=${URL}
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL?}
-      - ELASTICSEARCH_INDEX=workspace
-      - ELASTICSEARCH_MAPPING=edu-sharing
-      - EDUSHARING_URL=${EDUSHARING_URL?}
-    ports:
-      - '127.0.0.1:${ELASTICSEARCH_RELAY_PORT?}:80'
     restart: always
   analytics:
     image: openeduhub/oeh-search-analytics:${ANALYTICS_RELEASE}
